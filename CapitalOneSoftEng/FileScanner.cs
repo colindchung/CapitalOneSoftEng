@@ -122,19 +122,7 @@ namespace CapitalOneSoftEng
             }
 
             Regex r1 = new Regex(p1);
-            /*
-             * //:     Double Slash 
-             * 
-             */
             Regex r2 = new Regex(p2);
-            /*
-             * \":        Opening quote
-             * ([^\n]*):  Code block without new line
-             * //:        Double Slash
-             * ([^\n]*):  Codie block without new line
-             * \":        Closing quote
-             * 
-             */
 
             _singleCommentCount = r1.Matches(_fileData).Count - r2.Matches(_fileData).Count;
 
@@ -143,12 +131,6 @@ namespace CapitalOneSoftEng
         public void TodoCount()
         {
             Regex r = new Regex(@"(#|(//)|\*)([^\n]*)[Tt][Oo][Dd][Oo]");
-            /*
-             * (#|(//)|\*):        # OR // OR * 
-             * ([^\n]*):           Code block without new line
-             * [Tt][Oo][Dd][Oo]:   Todo, case insensitive
-             * 
-             */
 
             _todoCount = r.Matches(_fileData).Count;
         }
