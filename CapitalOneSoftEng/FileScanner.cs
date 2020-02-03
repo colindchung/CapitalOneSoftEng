@@ -21,6 +21,10 @@ namespace CapitalOneSoftEng
             _todoCount = 0;
         
 
+        /// <summary>
+        /// Create a file scanner when the file type is not known
+        /// </summary>
+        /// <param name="filePath"></param>
         public FileScanner(string filePath)
         {
             _fileName = filePath;
@@ -28,6 +32,11 @@ namespace CapitalOneSoftEng
             _fileType = (int)FileTypes.FileType.Default;
         }
 
+        /// <summary>
+        /// Create a file scanner when the file type is known
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="fileType"></param>
         public FileScanner(string filePath, int fileType)
         {
             _fileName = filePath;
@@ -35,6 +44,9 @@ namespace CapitalOneSoftEng
             _fileType = fileType;
         }
 
+        /// <summary>
+        /// Make appropriate function calls and print results to console
+        /// </summary>
         public void ScanAndPrint()
         {
             Console.WriteLine("Test results for: " + _fileName);
@@ -65,27 +77,37 @@ namespace CapitalOneSoftEng
             Console.WriteLine();
         }
 
-
+        /// <summary>
+        /// Count the number of lines in a file
+        /// </summary>
         public void LineCount()
         {
             _lineCount = _fileData.Split('\n').Length;
         }
 
+        /// <summary>
+        /// Count the number of blocks and lines within the blocks
+        /// </summary>
         public void BlockCommentCount()
         {
             string p = "", toCount = "";
 
-            if ((_fileType & 30) != 0)
+            if ((_fileType & 30) != 0) // 30 = Java, C#, C, C++
             {
                 p = @"/\*([^\*]|[\n]|(\*+([^\*/])))*\*/";
                 toCount = "*";
             }
-            else if ((_fileType & 96) != 0)
+            else if ((_fileType & 96) != 0) // 96 = JavaScript, TypeScript
             {
                 p = @"/\*([^\*]|[\n]|(\*+([^\*/])))*\*/";
                 toCount = "\n";
             }
-            else if ((_fileType & 1) != 0)
+            else if ((_fileType & 128) != 0) // 128 = SQL
+            {
+                p = @"/\*.*\s*.*\*/";
+                toCount = "\n";
+            }
+            else if ((_fileType & 1) != 0) // 1 = Python
             {
                 p = @"#([^\n]*)\n{1}([\t\f\a\e ]*)(#.*\n)+";
                 toCount = "#";
@@ -101,24 +123,34 @@ namespace CapitalOneSoftEng
             }
 
             _blockCommentCount = r.Matches(_fileData).Count;
-            _linesInBlockCount += ((_fileType & 96) != 0) ? _blockCommentCount : 0;
 
+            // When counting newlines, negate the (-1) on ln 106
+            // 224 = JavaScript, TypeScript, SQL
+            _linesInBlockCount += ((_fileType & 224) != 0) ? _blockCommentCount : 0; 
 
         }
 
+        /// <summary>
+        /// Count the number of single lines comments within a file
+        /// </summary>
         public void SingleCommentCount()
         {
             string p1 = "", p2 = "";
 
-            if((_fileType & 126) != 0)
+            if((_fileType & 126) != 0) // 126 = Java, C#, C, C++, JavaScript, TypeScript
             {
                 p1 = "//";
                 p2 = "\"([^\n]*)//([^\n]*)\"";
             }
-            else if((_fileType & 1) != 0)
+            else if((_fileType & 1) != 0) // 1 = Python
             {
                 p1 = "#";
                 p2 = "\"([^\n]*)#([^\n]*)\"";
+            }
+            else if ((_fileType & 128) != 0) // 128 = SQL
+            {
+                p1 = "--";
+                p2 = "\"([^\n]*)--([^\n]*)\"";
             }
 
             Regex r1 = new Regex(p1);
@@ -128,6 +160,9 @@ namespace CapitalOneSoftEng
 
         }
 
+        /// <summary>
+        /// Count the number of Todo's within a file
+        /// </summary>
         public void TodoCount()
         {
             Regex r = new Regex(@"(#|(//)|\*)([^\n]*)[Tt][Oo][Dd][Oo]");
