@@ -124,7 +124,7 @@ namespace CapitalOneSoftEng
 
             _blockCommentCount = r.Matches(_fileData).Count;
 
-            // When counting newlines, negate the (-1) on ln 106
+            // When counting newlines, negate the (-1) on ln 122
             // 224 = JavaScript, TypeScript, SQL
             _linesInBlockCount += ((_fileType & 224) != 0) ? _blockCommentCount : 0; 
 
